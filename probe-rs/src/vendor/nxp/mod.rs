@@ -28,6 +28,8 @@ impl Vendor for Nxp {
             DebugSequence::Arm(MIMXRT10xx::create())
         } else if chip.name.starts_with("MIMXRT11") {
             DebugSequence::Arm(MIMXRT11xx::create())
+        } else if chip.name.starts_with("S32K312") {
+            DebugSequence::Arm(S32K3xx::create_312())
         } else if chip.name.starts_with("S32K344") {
             DebugSequence::Arm(S32K3xx::create_344())
         } else if chip.name.starts_with("S32K388") {

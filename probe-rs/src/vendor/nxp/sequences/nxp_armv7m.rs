@@ -538,6 +538,7 @@ pub struct S32K3xx {
 
 #[derive(Debug)]
 enum S32Variant {
+    K312,
     K344,
     K388,
     K396,
@@ -559,6 +560,13 @@ impl S32K3xx {
     /// SDA_AP registers
     const DBGENCTRL: u8 = 0x80;
     const SDAAPRSTCTRL: u8 = 0x90;
+
+    /// Create a sequence handle for the S32K312.
+    pub fn create_312() -> Arc<dyn ArmDebugSequence> {
+        Arc::new(Self {
+            variant: S32Variant::K312,
+        })
+    }
 
     /// Create a sequence handle for the S32K344.
     pub fn create_344() -> Arc<dyn ArmDebugSequence> {
@@ -595,6 +603,8 @@ impl S32K3xx {
         // Release cores from reset (RSTRELTLCM7n = 1)
         let ctrl = match self.variant {
             // CM7_0/CM7_1
+            S32Variant::K312 => 0x0600_0000,
+            // CM7_0/CM7_1
             S32Variant::K344 => 0x0600_0000,
             // CM7_0/CM7_1/CM7_2/CM7_3
             S32Variant::K388 => 0x1E00_0000,
@@ -624,6 +634,12 @@ impl ArmDebugSequence for S32K3xx {
     /// The S32K3xx hard faults when you scan for nonexistent APs.
     fn valid_access_ports(&self) -> Option<&'static [u8]> {
         match self.variant {
+            S32Variant::K312 => Some(&[
+                Self::APB_AP_ID,
+                Self::CM7_0_AHB_AP_ID,
+                Self::MDM_AP_ID,
+                Self::SDA_AP_ID,
+            ]),
             S32Variant::K344 => Some(&[
                 Self::APB_AP_ID,
                 Self::CM7_0_AHB_AP_ID,
